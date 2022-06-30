@@ -9,15 +9,15 @@ class App extends React.Component {
     super(props);
     this.state = {
       entries: [],
-      term: '',
-      definition: ''
+      value: '',
+      search: ''
     }
 
     this.handleSearch = this.handleSearch.bind(this);
     this.handleAddOrUpdate = this.handleAddOrUpdate.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
-    this.handleTermChange = this.handleTermChange.bind(this);
-    this.handleDefinitionChange = this.handleDefinitionChange.bind(this);
+    this.handleAddChange = this.handleAddChange.bind(this);
+    this.handleSearchChange = this.handleSearchChange.bind(this);
   }
 
   generateList() {
@@ -36,24 +36,21 @@ class App extends React.Component {
     });
   }
 
-  handleAddOrUpdate(event) {
+  handleAddOrUpdate() {
+    console.log(this.state.term, this.state.definition);
     // makes a post request to add this entry to the database
-    console.log("2");
-    axios({
-      method: "POST",
-      url: "/glossary",
-      data: { term: this.state.term, definiton: this.state.definition },
+    /*axios.request({
+      method: 'post',
+      url: '/glossary',
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json;charset=UTF-8",
+        "Content-Type": "application/json",
+        'Authorization': 'Token'
       },
-    })
-      .then(res => {
-        this.updateList();
-      })
-      .catch(err => {
-        console.log(err);
-      });
+      data: {
+      }
+    }).then(response => console.log("Entry Created")).catch(err => {
+      console.log("Error Updating List: ", err);
+    });*/
 
   }
 
@@ -84,30 +81,17 @@ class App extends React.Component {
     });
   }
 
-  handleTermChange(event) {
-    this.setState({ term: event.target.value });
+  handleAddChange(event) {
+    this.setState({value: event.target.value});
   }
 
-  handleDefinitionChange(event) {
-    this.setState({ definition: event.target.value });
+  handleSearchChange(event) {
+    this.setState({search: event.target.value});
   }
 
   componentDidMount() {
 
-    axios.request({
-      method: 'post',
-      url: '/glossary',
-      headers: {
-        "Content-Type": "application/json",
-        'Authorization': 'Token'
-      },
-      data: {
-        term: "exampleTerm",
-        definition: "Example Definition"
-      }
-    }).then(response => console.log(response)).catch(err => {
-      console.log("Error Updating List: ", err);
-    });
+
   }
 
   render() {
@@ -116,18 +100,25 @@ class App extends React.Component {
       <div>
         <h1>Glossary</h1>
 
-        <form>
-          <input type="text" id="search" />
-          <input type="submit" onSubmit={this.handleSearch} />
+        <form onSubmit={this.handleSearch}>
+          <input type="text" value={this.state.search} onChange={this.handleSearchChange}/>
+          <input type="submit"  value="Search" />
         </form>
 
         <br></br>
 
-        <form id="add">
-          <input type="text" id="term" onChange={this.handleTermChange} />
-          <input type="text" id="definition" onChange={this.handleDefinitionChange} />
-          <input type="submit" onSubmit={this.handleAddOrUpdate} />
+        <form onSubmit={this.handleAddOrUpdate}>
+          <label>Add (format = term: definition)
+            <br></br>
+          <input type="text" value={this.state.value} onChange={this.handleAddChange} />
+          </label>
+          <input type="submit" value="Submit" />
         </form>
+
+        <div>
+          <p>{this.state.search}</p>
+          <p>{this.state.value}</p>
+        </div>
 
         <ul>
           {this.generateList()}
