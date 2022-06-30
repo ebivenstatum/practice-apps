@@ -25,9 +25,16 @@ app.post('/glossary', function(req, res) {
 });
 
 app.get('/glossary', function(req, res) {
-  db.find(req.body).then(items => {
-    return res.json(items);
-  });
+  db.getItems(req.body, function(err, data) {
+    if(err) {
+      console.log(err);
+      res.sendStatus(500);
+    } else {
+      console.log(data);
+      res.status(200).send(data);
+    }
+  })
+
 });
 
 app.listen(3000);

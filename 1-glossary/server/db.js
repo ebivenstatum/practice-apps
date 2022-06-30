@@ -24,40 +24,40 @@ const glossarySchema = new mongoose.Schema({
 
 const Glossary = new mongoose.model("Glossary", glossarySchema);
 
+/*Glossary.remove({}, function(err) {
+  console.log('collection removed')
+});*/
+
 const create = (data) => {
   // takes term and def as data
   console.log(data);
-  /*Glossary.create(data).exec((err, results) => {
-    if (err) {
+  Glossary.create(data).then(results => {
+    /*if (err) {
       console.log("Error!", err);
-    } else {
-      console.log("Entry Successfully Created");
-    }
-  });*/
+    } else {*/
+      console.log("Entry Successfully Created", results);
+    //}
+  });
 };
 
-const find = (term) => {
+const getItems = (term, callback) => {
   // if search term does not exist, return all db entries
   if (term) {
-    Glossary.find(term).sort({ term: 'asc' }).exec((err, results) => {
-      if (err) {
-        console.log('Error: ', err);
-      } else {
-        return results;
-      }
-    });
+
+    Glossary.find(term).sort({ term: 'asc' })
+    .then(results => callback(null, results))
+    .catch(err => callback(err));
+
   } else {
-    Glossary.find().sort({ term: 'asc' }).exec((err, results) => {
-      if (err) {
-        console.log('Error: ', err);
-      } else {
-        return results;
-      }
-    });
+
+    Glossary.find().sort({ term: 'asc' })
+    .then(results => callback(null, results))
+    .catch(err => callback(err));
   }
+
 };
 
 module.exports = {
   create,
-  find
+  getItems
 }
