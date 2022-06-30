@@ -15,31 +15,43 @@ class App extends React.Component {
 
     this.handleSearch = this.handleSearch.bind(this);
     this.handleAddOrUpdate = this.handleAddOrUpdate.bind(this);
-    this.handleDelete = this.handleDelete.bind(this);
     this.handleAddChange = this.handleAddChange.bind(this);
     this.handleSearchChange = this.handleSearchChange.bind(this);
   }
 
-  generateList() {
+  /*generateList() {
     // for each item in this.state.entries, generate a list item containing term, definition, update button, and delete button
+    console.log('generated!')
     this.state.entries.forEach(entry => {
       return (
-        <li>{entry[0]}: {entry[1]}<button id="updateButton" onClick={this.handleAddOrUpdate}>Update</button><button id="deleteButton" onClick={this.handleDelete}>Delete</button></li>
+        <li>{entry.term}: {entry.definition}<button id="updateButton" onClick={this.handleAddOrUpdate}>Update</button><button id="deleteButton" onClick={this.handleDelete}>Delete</button></li>
       );
     });
-  }
 
-  handleSearch(term) {
+  }*/
+
+  handleSearch(event) {
     // makes a get request that returns and renders all entries containing that term
-    axios.get('/glossary', term).then(response => this.setState({ entries: response.data })).catch(err => {
-      console.log(err);
-    });
+    event.preventDefault();
+
+    axios
+      .get('/glossary', this.state.search)
+      .then(response => this.setState({ entries: response.data, search: '' }))
+      .catch(err => {
+        console.log(err);
+      });
+
   }
 
-  handleAddOrUpdate() {
-    console.log(this.state.term, this.state.definition);
+  handleAddOrUpdate(event) {
+
+    event.preventDefault();
+
+    let input = this.state.value.split(': ');
+    this.setState({ value: '' });
+
     // makes a post request to add this entry to the database
-    /*axios.request({
+    axios.request({
       method: 'post',
       url: '/glossary',
       headers: {
@@ -47,62 +59,51 @@ class App extends React.Component {
         'Authorization': 'Token'
       },
       data: {
+        term: input[0],
+        definition: input[1]
       }
     }).then(response => console.log("Entry Created")).catch(err => {
       console.log("Error Updating List: ", err);
-    });*/
+    });
 
-  }
-
-  handleDelete(entry) {
-    // makes a post request to delete this entry from database
-    console.log("1");
-    axios({
-      method: "POST",
-      url: "/glossary",
-      data: entry,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json;charset=UTF-8",
-      },
-    })
-      .then(res => {
-        this.updateList();
-      })
-      .catch(err => {
-        console.log(err);
-      });
   }
 
   updateList() {
     // makes a get request for all entries currently in database
-    axios.get('/glossary').then(response => this.setState({ entries: response.data })).catch(err => {
-      console.log("Error Updating List: ", err);
-    });
+    axios
+      .get('/glossary')
+      .then(response => this.setState({ entries: response.data }))
+      //.then(response => this.generateList())
+      .catch(err => {
+        console.log("Error Updating List: ", err);
+      });
   }
 
   handleAddChange(event) {
-    this.setState({value: event.target.value});
+    this.setState({ value: event.target.value });
   }
 
   handleSearchChange(event) {
-    this.setState({search: event.target.value});
+    this.setState({ search: event.target.value });
   }
 
   componentDidMount() {
-
-
+    this.updateList();
   }
 
   render() {
+
+    const listItems = this.state.entries.map((entry) => <div><p>{entry.term}: {entry.definition}<button id="updateButton" onClick={this.handleAddOrUpdate}>Update</button></p><br></br></div>);
 
     return (
       <div>
         <h1>Glossary</h1>
 
+        <br></br>
+
         <form onSubmit={this.handleSearch}>
-          <input type="text" value={this.state.search} onChange={this.handleSearchChange}/>
-          <input type="submit"  value="Search" />
+          <input type="text" value={this.state.search} onChange={this.handleSearchChange} />
+          <input type="submit" value="Search" />
         </form>
 
         <br></br>
@@ -110,19 +111,17 @@ class App extends React.Component {
         <form onSubmit={this.handleAddOrUpdate}>
           <label>Add (format = term: definition)
             <br></br>
-          <input type="text" value={this.state.value} onChange={this.handleAddChange} />
+            <input type="text" value={this.state.value} onChange={this.handleAddChange} />
           </label>
           <input type="submit" value="Submit" />
         </form>
 
+        <br></br>
+
         <div>
-          <p>{this.state.search}</p>
-          <p>{this.state.value}</p>
+          {listItems}
         </div>
 
-        <ul>
-          {this.generateList()}
-        </ul>
       </div>
     );
 
