@@ -1,10 +1,11 @@
-require("dotenv").config();
+//require("dotenv").config();
 const express = require("express");
 const path = require("path");
-const db = require("./server/db.js"); // import mongoose db
+const db = require("./db.js"); // import mongoose db
 
 const app = express();
 
+app.use(express.json());
 // Serves up all static and generated assets in ../client/dist.
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
@@ -15,17 +16,19 @@ app.use(express.static(path.join(__dirname, "../client/dist")));
  *
  *
  */
-app.post(file, function(req, res) {
-  app.create(req.body).then(data => {
-    res.sendStatus();
-  });
+app.post('/glossary', function(req, res) {
+
+  db.create({term: req.body.term, definition: req.body.definition});
+  //.then(data => {
+    res.sendStatus(201);
+  //})
 });
 
-app.get(file, function(req, res) {
+app.get('/glossary', function(req, res) {
   db.find(req.body).then(items => {
     return res.json(items);
   });
 });
 
-app.listen(process.env.PORT);
-console.log(`Listening at http://localhost:${process.env.PORT}`);
+app.listen(3000);
+console.log(`Listening at http://localhost:3000`);

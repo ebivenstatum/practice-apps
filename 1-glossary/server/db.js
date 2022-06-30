@@ -1,13 +1,12 @@
 const mongoose = require("mongoose");
-const config = reqire("./server/.env");
+//const config = reqire("./server/.env");
 
 // 1. Use mongoose to establish a connection to MongoDB
 // 2. Set up any schema and models needed by the app
 // 3. Export the models
 // 4. Import the models into any modules that need them
 
-mongoose
-  .connect(`mongodb://127.0.0.1:${config.PORT}/${config.DB_NAME}`)
+mongoose.connect(`mongodb://localhost/glossary`)
   .then(() => console.log("Database Connected"))
   .catch(err => console.log(err));
 
@@ -27,15 +26,34 @@ const Glossary = new mongoose.model("Glossary", glossarySchema);
 
 const create = (data) => {
   // takes term and def as data
-  return Glossary.create(data).exec();
+  console.log(data);
+  /*Glossary.create(data).exec((err, results) => {
+    if (err) {
+      console.log("Error!", err);
+    } else {
+      console.log("Entry Successfully Created");
+    }
+  });*/
 };
 
 const find = (term) => {
   // if search term does not exist, return all db entries
   if (term) {
-    return Glossary.find({term}).exec();
+    Glossary.find(term).sort({ term: 'asc' }).exec((err, results) => {
+      if (err) {
+        console.log('Error: ', err);
+      } else {
+        return results;
+      }
+    });
   } else {
-    return Glossary.find().exec();
+    Glossary.find().sort({ term: 'asc' }).exec((err, results) => {
+      if (err) {
+        console.log('Error: ', err);
+      } else {
+        return results;
+      }
+    });
   }
 };
 
