@@ -17,26 +17,30 @@ class App extends React.Component {
     this.handleAddOrUpdate = this.handleAddOrUpdate.bind(this);
     this.handleAddChange = this.handleAddChange.bind(this);
     this.handleSearchChange = this.handleSearchChange.bind(this);
+    //this.updateList = this.updateList.bind(this);
   }
 
-  /*generateList() {
-    // for each item in this.state.entries, generate a list item containing term, definition, update button, and delete button
-    console.log('generated!')
-    this.state.entries.forEach(entry => {
-      return (
-        <li>{entry.term}: {entry.definition}<button id="updateButton" onClick={this.handleAddOrUpdate}>Update</button><button id="deleteButton" onClick={this.handleDelete}>Delete</button></li>
-      );
-    });
-
-  }*/
-
   handleSearch(event) {
-    // makes a get request that returns and renders all entries containing that term
+    // filters all entries using search term
     event.preventDefault();
 
     axios
-      .get('/glossary', this.state.search)
-      .then(response => this.setState({ entries: response.data, search: '' }))
+      .get('/glossary')
+      .then(response => this.setState({ entries: response.data }))
+      .then(() => {
+        let newEntries = [];
+
+        this.state.entries.forEach(entry => {
+
+          if (entry.term.includes(this.state.search) || entry.definition.includes(this.state.search)) {
+            newEntries.push(entry)
+          }
+
+        });
+
+        this.setState({ entries: newEntries, search: '' });
+
+      })
       .catch(err => {
         console.log(err);
       });
@@ -51,29 +55,32 @@ class App extends React.Component {
     this.setState({ value: '' });
 
     // makes a post request to add this entry to the database
-    axios.request({
-      method: 'post',
-      url: '/glossary',
-      headers: {
-        "Content-Type": "application/json",
-        'Authorization': 'Token'
-      },
-      data: {
-        term: input[0],
-        definition: input[1]
-      }
-    }).then(response => console.log("Entry Created")).catch(err => {
-      console.log("Error Updating List: ", err);
-    });
+    axios
+      .request({
+        method: 'post',
+        url: '/glossary',
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': 'Token'
+        },
+        data: {
+          term: input[0],
+          definition: input[1]
+        }
+      })
+      .then(response => this.updateList())
+      .catch(err => {
+        console.log("Error Updating List: ", err);
+      });
 
   }
 
   updateList() {
     // makes a get request for all entries currently in database
+
     axios
       .get('/glossary')
       .then(response => this.setState({ entries: response.data }))
-      //.then(response => this.generateList())
       .catch(err => {
         console.log("Error Updating List: ", err);
       });
@@ -93,7 +100,7 @@ class App extends React.Component {
 
   render() {
 
-    const listItems = this.state.entries.map((entry) => <div><p>{entry.term}: {entry.definition}<button id="updateButton" onClick={this.handleAddOrUpdate}>Update</button></p><br></br></div>);
+    const listItems = this.state.entries.map((entry) => <div key={entry.term}><p>{entry.term}: {entry.definition}  <button id="updateButton" onClick={this.handleAddOrUpdate}>Update</button> <button id="deleteButton" >Delete</button></p><br></br></div>);
 
     return (
       <div>
