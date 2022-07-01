@@ -19,21 +19,22 @@ app.use(express.static(path.join(__dirname, "../client/dist")));
 app.post('/glossary', function(req, res) {
 
   db.create({term: req.body.term, definition: req.body.definition});
-  //.then(data => {
-    res.sendStatus(201);
-  //})
+  res.sendStatus(201);
+
 });
 
 app.get('/glossary', function(req, res) {
-  db.getItems(req.body, function(err, data) {
+
+  db.getItems(function(err, data) {
+
     if(err) {
       console.log(err);
       res.sendStatus(500);
     } else {
-      console.log(data);
       res.status(200).send(data);
     }
-  })
+
+  });
 
 });
 

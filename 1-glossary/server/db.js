@@ -29,31 +29,20 @@ const Glossary = new mongoose.model("Glossary", glossarySchema);
 });*/
 
 const create = (data) => {
-  // takes term and def as data
-  console.log(data);
-  Glossary.create(data).then(results => {
-    /*if (err) {
-      console.log("Error!", err);
-    } else {*/
-      console.log("Entry Successfully Created", results);
-    //}
-  });
+
+  Glossary.create(data)
+    .then(results => {
+      console.log("Entry Successfully Created");
+    })
+    .catch(err => console.log(err));
+
 };
 
-const getItems = (term, callback) => {
-  // if search term does not exist, return all db entries
-  if (term) {
+const getItems = (callback) => {
 
-    Glossary.find(term).sort({ term: 'asc' })
+  Glossary.find().sort({ term: 'asc' })
     .then(results => callback(null, results))
     .catch(err => callback(err));
-
-  } else {
-
-    Glossary.find().sort({ term: 'asc' })
-    .then(results => callback(null, results))
-    .catch(err => callback(err));
-  }
 
 };
 
