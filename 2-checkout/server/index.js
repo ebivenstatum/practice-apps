@@ -19,13 +19,25 @@ app.use(logger);
 // Serves up all static and generated assets in ../client/dist.
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
-/**** 
- * 
- * 
+app.use(express.json());
+
+/****
+ *
+ *
  * Other routes here....
  *
- * 
+ *
  */
+app.post('/checkout', (req, res) => {
+  db.add(req.body, (err, data) => {
+    if (err) {
+      res.status(500).send(err)
+    } else {
+      res.status(201).send('Form Succesfully Submitted')
+    }
+  });
+});
 
-app.listen(process.env.PORT);
-console.log(`Listening at http://localhost:${process.env.PORT}`);
+//app.listen(process.env.PORT);
+app.listen(3000);
+console.log(`Listening at http://localhost:3000`);
