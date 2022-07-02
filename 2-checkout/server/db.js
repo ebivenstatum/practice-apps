@@ -3,10 +3,10 @@ const Promise = require("bluebird");
 
 // Configure process.env variables in ../.env
 const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'checkout',
 });
 
 const db = Promise.promisifyAll(connection, { multiArgs: true });
@@ -20,5 +20,15 @@ db.connectAsync()
     )
   )
   .catch((err) => console.log(err));
+
+db.add = function(data, callback) {
+  db.queryAsync(`INSERT INTO USER (session_id, user_name, user_email, user_password, address_one, address_two, city, state, address_zip, phone_number, credit_card_number, expiry_date, cvv, billing_zip) VALUES (${data.session_cookie}, ${data.name}, ${data.email}, ${data.password}, ${data.address_one}, ${data.address_two}, ${data.city}, ${data.state}, ${data.address_zip}, ${data.phone_number}, ${data.credit_card_number}, ${data.expiry_data}, ${data.cvv}, ${data.billing_zip})`)
+  .then((response) => {
+    callback(null, response);
+  })
+  .catch(err => {
+    callback(err);
+  })
+}
 
 module.exports = db;
