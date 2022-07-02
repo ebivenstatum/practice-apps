@@ -31,7 +31,7 @@ app.use(express.json());
 app.post('/checkout', (req, res) => {
   db.add(req.body, (err, data) => {
     if (err) {
-      res.status(500).send(err)
+      console.log(err)
     } else {
       res.status(201).send('Form Succesfully Submitted')
     }
